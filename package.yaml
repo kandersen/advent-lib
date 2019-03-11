@@ -1,4 +1,4 @@
-name: advent-lib
+name: libadvent
 version: 0.2.0.18
 ghc-options: -Wall -fwarn-tabs -fwarn-incomplete-record-updates -fwarn-monomorphism-restriction -fwarn-unused-do-bind
 dependencies:

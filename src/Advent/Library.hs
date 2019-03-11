@@ -15,7 +15,14 @@ module Advent.Library (
   pop,
 
   evolve,
+  fromBuilders,
+  applyAll,
+  snoc, 
+  for,
+  fixedPoint,
+  (!!?),
 
+  Parser,
   module Text.Megaparsec,
   module Text.Megaparsec.Char
   ) where
@@ -45,6 +52,7 @@ natural = foldl (\acc n -> acc * 10 + fromIntegral (digitToInt n)) 0 <$> some di
 
 integer :: (Read a, Num a) => Parser a
 integer = (char '-' *> (negate <$> integer))
+      <|> char '+' *> integer
       <|> natural
 
 pLines :: Parser a -> Parser [a]
@@ -75,17 +83,26 @@ evolve :: [a -> a] -> a -> [a]
 evolve [] a = [a]
 evolve (f:fs) a = a : evolve fs (f a)
 
-{-
+fromBuilders :: a -> [a -> a] -> a
+fromBuilders = foldl (flip ($))
 
-splitOn :: Eq a => a -> [a] -> [[a]]
-splitOn c input = case break (==c) input of
-  (xs, []) -> [xs]
-  (xs, _:ys) -> xs : splitOn c ys
+applyAll = fromBuilders
 
-isSubsequenceOf :: (Eq a) => [a] -> [a] -> Bool
-isSubsequenceOf []        _ = True
-isSubsequenceOf  _       [] = False
-isSubsequenceOf xs ys@(_:ys') =
-  xs `isPrefixOf` ys || xs `isSubsequenceOf` ys'
+snoc :: [a] -> a -> [a]
+snoc ys x = foldr (:) [x] ys
 
--}
+for :: [a] -> (a -> b) -> [b]
+for = flip map
+
+fixedPoint :: (a -> a -> Bool) -> [a] -> a
+fixedPoint eq = go
+  where
+    go (x:xs@(y:_)) | eq x y = x
+                    | otherwise = go xs
+
+infixl 9 !!?
+
+(!!?) :: [a] -> Int -> Maybe a
+[] !!? _ = Nothing
+(x:_) !!? 0 = Just x 
+(_:xs) !!? n = xs !!? (n - 1)

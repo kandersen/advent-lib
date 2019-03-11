@@ -20,6 +20,7 @@ data Trie c a = Trie {
     children :: Map c (Trie c a)
   }
 
+-- Docs
 empty :: Trie c (Maybe a)
 empty = Trie Nothing Map.empty
 
